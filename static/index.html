@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Scam Detector</title>
+    <style>
+        body { font-family: Arial; background:#f4f6f8; padding:20px }
+        .box { background:white; padding:15px; margin-bottom:15px; border-radius:8px }
+        .scam { color:red; font-weight:bold }
+        .safe { color:green; font-weight:bold }
+        textarea, input { width:100%; padding:8px; margin-top:5px }
+        button { padding:10px; margin-top:10px; width:100% }
+    </style>
+</head>
+
+<body>
+
+<h2>🛡️ AI Scam Detection System</h2>
+
+<div class="box">
+    <label>X-API-KEY</label>
+    <input id="apiKey" placeholder="Enter x-api-key">
+</div>
+
+<div class="box">
+    <label>Message</label>
+    <textarea id="message" rows="4"></textarea>
+    <button onclick="analyze()">Analyze</button>
+</div>
+
+<div class="box">
+    <h3>🚨 Scam Detection</h3>
+    <div id="scamResult"></div>
+</div>
+
+<div class="box">
+    <h3>🤖 Agent Reply</h3>
+    <div id="agentReply"></div>
+</div>
+
+<script>
+async function analyze() {
+    const apiKey = document.getElementById("apiKey").value;
+    const message = document.getElementById("message").value;
+
+    const response = await fetch("/scam-message", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": apiKey
+        },
+        body: JSON.stringify({
+            conversation_id: "conv1",
+            message: message
+        })
+    });
+
+    const data = await response.json();
+
+    if (data.scam_detected) {
+        document.getElementById("scamResult").innerHTML =
+            `<span class="scam">SCAM DETECTED (Confidence: ${data.confidence})</span>`;
+    } else {
+        document.getElementById("scamResult").innerHTML =
+            `<span class="safe">No Scam Detected</span>`;
+    }
+
+    document.getElementById("agentReply").innerText = data.agent_reply;
+}
+</script>
+
+</body>
+</html>
